@@ -33,10 +33,9 @@ void do_some_filling(){
 
 void get_some_addrinfo(){
 	struct addrinfo hints = {
-		.ai_family = AF_UNSPEC, // tanto faz IPv4 ou v6
+		.ai_family = AF_INET, // IPv4
 		.ai_socktype = SOCK_STREAM, // socket com conexão
 		.ai_protocol = 0, // qualquer protocolo
-		.ai_flags = AI_PASSIVE // Preenche meu IP automaticamente
 	};
 	
 	struct addrinfo *res;
@@ -44,6 +43,18 @@ void get_some_addrinfo(){
 	int retval = getaddrinfo("www.google.com", "http", &hints, &res);
 
 	printf("Retval: %d\n", retval);
+
+	struct addrinfo *iter = res;
+	while(iter != NULL){
+		printf("(socktype, protocol) = (%d, %d)\n", iter->ai_socktype, iter->ai_protocol);
+		
+		int binaddr = ((struct sockaddr_in *) iter->ai_addr)->sin_addr.s_addr;
+		char textaddr[INET_ADDRSTRLEN];
+		inet_ntop(iter->ai_addr->sa_family, &binaddr, textaddr, INET_ADDRSTRLEN);
+		printf("Address: %s\n", textaddr);
+		
+		iter = iter->ai_next;
+	}
 
 	freeaddrinfo(res);
 }
