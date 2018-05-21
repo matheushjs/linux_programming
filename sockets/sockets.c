@@ -91,6 +91,21 @@ void bind_some_sockets(){
 int main(int argc, char *argv[]){
 	// do_some_filling();
 	// get_some_addrinfo();
-	bind_some_sockets();
+	
+	
+	// We fork 4 processes and identify each of them with an ID
+	int ret1 = fork();
+	int ret2 = fork();
+
+	// Normalize variables to 0 or 1
+	ret1 = (ret1 != 0);
+	ret2 = (ret2 != 0);
+
+	// Get the id
+	// the pair (ret2, ret1) is seen as a binary number.
+	int myId = ret2*2 + ret1;
+
+	printf("Hello! I am node: %d\n", myId);
+	
 	return 0;
 }
