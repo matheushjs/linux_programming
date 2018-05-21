@@ -99,7 +99,7 @@ void node_listen(int myId){
 	printf("Node %d is listening\n", myId);
 
 	struct addrinfo *res;
-	getaddrinfo("localhost", "5009", &hints, &res);
+	getaddrinfo("10.0.2.15", "5009", &hints, &res);
 
 	int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	printf("My sockfd: %d\n", sockfd);
@@ -159,7 +159,7 @@ void node_send(int myId){
 
 	struct addrinfo *res;
 	
-	while( 0 != getaddrinfo("127.0.0.1", "5009", &hints, &res) ){
+	while( 0 != getaddrinfo("10.0.2.15", "5009", &hints, &res) ){
 		printf("Error in process %d\n", myId);
 	}
 
