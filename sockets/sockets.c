@@ -7,6 +7,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include "elf_sockets.h"
+
 void do_some_filling(){
 	int binaddr;
 	inet_pton(AF_INET, "172.217.29.132", &binaddr); // presentation to network (text to binary)
@@ -203,10 +205,13 @@ int main(int argc, char *argv[]){
 
 	// Node 0 will listen and print to what the other nodes send
 	if(myId == 0){
-		node_listen(myId);
+		// node_listen(myId);
 	} else {
-		node_send(myId);
+		// node_send(myId);
 	}
 	
+	ElfSocket_init(myId);
+	ElfSocket_finalize();
+
 	return 0;
 }

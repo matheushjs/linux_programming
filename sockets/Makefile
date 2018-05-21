@@ -1,2 +1,2 @@
 all:
-	gcc -Wall sockets.c -o sockets
+	gcc -Wall sockets.c elf_sockets.c -o sockets
