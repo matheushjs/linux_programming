@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 void do_some_filling(){
 	int binaddr;
@@ -88,6 +90,100 @@ void bind_some_sockets(){
 	printf("Accept ret: %d\n", ret);
 }
 
+void node_listen(int myId){
+	struct addrinfo hints = {
+		.ai_family = AF_UNSPEC,
+		.ai_socktype = SOCK_STREAM,
+	};
+
+	printf("Node %d is listening\n", myId);
+
+	struct addrinfo *res;
+	getaddrinfo("localhost", "5009", &hints, &res);
+
+	int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	printf("My sockfd: %d\n", sockfd);
+
+	int optval = 1;
+	
+	int ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+	if(ret == -1){
+		perror("setsockopt");
+	}
+
+	ret = bind(sockfd, res->ai_addr, res->ai_addrlen);
+
+	if(ret != 0){
+		printf("Failed binding socket\n");
+		perror(NULL);
+		close(sockfd);
+		return;
+	}
+
+	ret = listen(sockfd, 5);
+	printf("Listening? %d\n", ret);
+
+
+	// Accept data
+	int counter = 0;
+	while(counter < 3){
+		struct sockaddr_storage client_addr;
+		socklen_t client_len = sizeof(struct sockaddr_storage);
+		
+		int client_sockfd = accept(sockfd, (struct sockaddr *) &client_addr, &client_len);
+		
+		// Read data
+		char message[24];
+		int ret = recv(client_sockfd, message, 24 * sizeof(char), 0);
+		message[ret] = '\0';
+
+		// PRINTTTTT!!!@!@!#$@$!@%$@&!%#*&
+		printf("Received: %s, with return value %d\n", message, ret);
+
+		close(client_sockfd);
+
+		counter++;
+	}
+
+	printf("Node %d will stop listening.\n", myId);
+	close(sockfd);
+}
+
+void node_send(int myId){
+	struct addrinfo hints = {
+		.ai_family = AF_UNSPEC,
+		.ai_socktype = SOCK_STREAM,
+	};
+
+	sleep(1);
+
+	struct addrinfo *res;
+	
+	while( 0 != getaddrinfo("127.0.0.1", "5009", &hints, &res) ){
+		printf("Error in process %d\n", myId);
+	}
+
+	int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	int ret = connect(sockfd, res->ai_addr, res->ai_addrlen);
+	
+	if(myId == 1){
+		printf("Connected? %d\n", ret);
+	}
+
+	char message[24] = { '\0' };
+	sprintf(message, "Hello from process: %d", myId);
+
+	// Send!
+	ret = send(sockfd, message, strlen(message), 0);
+
+	if(myId == 1){
+		printf("Sent? %d\n", ret);
+	}
+
+	sleep(1);
+	close(sockfd);
+}
+
 int main(int argc, char *argv[]){
 	// do_some_filling();
 	// get_some_addrinfo();
@@ -105,7 +201,12 @@ int main(int argc, char *argv[]){
 	// the pair (ret2, ret1) is seen as a binary number.
 	int myId = ret2*2 + ret1;
 
-	printf("Hello! I am node: %d\n", myId);
+	// Node 0 will listen and print to what the other nodes send
+	if(myId == 0){
+		node_listen(myId);
+	} else {
+		node_send(myId);
+	}
 	
 	return 0;
 }
