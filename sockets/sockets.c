@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include <netdb.h>
 #include <stdio.h>
 
@@ -59,7 +60,37 @@ void get_some_addrinfo(){
 	freeaddrinfo(res);
 }
 
+void bind_some_sockets(){
+	struct addrinfo hints = {
+		.ai_family = AF_UNSPEC,
+		.ai_socktype = SOCK_STREAM,
+		.ai_flags = AI_PASSIVE, // Place my IP
+	};
+
+	struct addrinfo *res;
+	getaddrinfo(NULL, "5000", &hints, &res);
+
+	int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	
+	printf("Socket fd: %d\n", sockfd);
+	
+	int ret = bind(sockfd, res->ai_addr, res->ai_addrlen); // Bind to a port in my computer
+	printf("Bind ret: %d\n", ret);
+
+	ret = listen(sockfd, 5);
+	printf("Listen ret: %d\n", ret);
+
+	close(sockfd);
+	
+	struct sockaddr_storage client_addr;
+	socklen_t client_len = sizeof(struct sockaddr_storage);
+	ret = accept(sockfd, (struct sockaddr *) &client_addr, &client_len);
+	printf("Accept ret: %d\n", ret);
+}
+
 int main(int argc, char *argv[]){
-	get_some_addrinfo();
+	// do_some_filling();
+	// get_some_addrinfo();
+	bind_some_sockets();
 	return 0;
 }
