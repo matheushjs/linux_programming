@@ -94,7 +94,8 @@ void ElfSocket_send(void *buf, int bufLen, int dest){
 	int bytesLeft = bufLen;
 	while(bytesLeft != 0){
 		int nbytes = send(sockfd, buf + bytesSent, bytesLeft, 0);
-		// printf("Process %d sent to %d %d bytes.\n", myId, dest, nbytes);
+		
+		if(dest == 0) printf("Process %d sent to %d %d bytes.\n", myId, dest, nbytes);
 		
 		bytesSent += nbytes;
 		bytesLeft -= nbytes;

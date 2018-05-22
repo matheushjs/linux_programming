@@ -208,14 +208,38 @@ int main(int argc, char *argv[]){
 	
 	ElfSocket_init(myId);
 
-	if(myId == 0){
-		char message[] = "Hello from 0";
-		ElfSocket_send(message, strlen(message), 1);
-	} else if(myId == 1) {
-		char message[24] = { '\0' };
-		ElfSocket_recv(message, 12);
-		printf("%s\n", message);
+	// In this test, we create a vector of size 10000 with numbers from 0 to 9999
+	//   multiplied by the (processId + 1)
+	// Processes 0, 1, 2, 3 are in a logical ring topology
+	// Each process should send the vector to the next one, and receive from the previous
+#define TEST_SIZE 1000
+	static int message[TEST_SIZE];
+	static int buffer[TEST_SIZE];
+	int i;
+	for(i = 0; i < TEST_SIZE; i++) message[i] = i * myId;
+
+	int nextProc = (myId + 1) % 4;
+	int prevProc = (myId - 1 + 4) % 4;
+
+	if(myId%2 == 0){
+		ElfSocket_send(message, TEST_SIZE * sizeof(int), nextProc);
+		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int));
+	} else {
+		ElfSocket_send(message, TEST_SIZE * sizeof(int), nextProc);
+		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int));
 	}
+
+	// Just so we can visualize better later
+	if(myId == 0) sleep(1);
+
+	int good = 1;
+	for(i = 0; i < TEST_SIZE; i++){
+		if(buffer[i] != i * prevProc) good = 0;
+		if(myId == 0) printf("%d ", buffer[i]);
+	}
+
+	if(good)
+		printf("Process %d says GOOD!\n", myId);
 
 	ElfSocket_finalize();
 
