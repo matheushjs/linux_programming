@@ -57,6 +57,7 @@ void ElfSocket_init(int procId){
 		close(recv_sockfd);
 		exit(2);
 	}
+	freeaddrinfo(res);
 
 	
 	// Get send socket
@@ -80,6 +81,7 @@ void ElfSocket_init(int procId){
 		close(send_sockfd);
 		exit(3);
 	}
+	freeaddrinfo(res);
 
 
 	// Listen on the receiving socket
