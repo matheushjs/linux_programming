@@ -2,6 +2,8 @@
 #define ELF_SOCKETS_H
 
 void ElfSocket_init(int procId);
+void ElfSocket_send(void *buf, int bufLen, int dest);
+void ElfSocket_recv(void *buf, int bufLen);
 void ElfSocket_finalize();
 
 #endif

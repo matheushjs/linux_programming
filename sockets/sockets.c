@@ -187,10 +187,6 @@ void node_send(int myId){
 }
 
 int main(int argc, char *argv[]){
-	// do_some_filling();
-	// get_some_addrinfo();
-	
-	
 	// We fork 4 processes and identify each of them with an ID
 	int ret1 = fork();
 	int ret2 = fork();
@@ -211,6 +207,16 @@ int main(int argc, char *argv[]){
 	}
 	
 	ElfSocket_init(myId);
+
+	if(myId == 0){
+		char message[] = "Hello from 0";
+		ElfSocket_send(message, strlen(message), 1);
+	} else if(myId == 1) {
+		char message[24] = { '\0' };
+		ElfSocket_recv(message, 12);
+		printf("%s\n", message);
+	}
+
 	ElfSocket_finalize();
 
 	return 0;
