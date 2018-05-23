@@ -206,7 +206,7 @@ int main(int argc, char *argv[]){
 		// node_send(myId);
 	}
 	
-	ElfSocket_init(myId);
+	ElfSocket_init(myId, 4);
 
 	// In this test, we create a vector of size 10000 with numbers from 0 to 9999
 	//   multiplied by the (processId + 1)
@@ -223,10 +223,10 @@ int main(int argc, char *argv[]){
 
 	if(myId%2 == 0){
 		ElfSocket_send(message, TEST_SIZE * sizeof(int), nextProc);
-		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int));
+		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int), prevProc);
 	} else {
+		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int), prevProc);
 		ElfSocket_send(message, TEST_SIZE * sizeof(int), nextProc);
-		ElfSocket_recv(buffer, TEST_SIZE * sizeof(int));
 	}
 
 	// Just so we can visualize better later
