@@ -118,9 +118,7 @@ void ElfSocket_send(void *buf, int bufLen, int dest){
 
 	// Connect to destiny
 	while( connect(sockfd, res->ai_addr, res->ai_addrlen) != 0 ){
-		perror("connect");
-		printf("Connect error at process %d\n", g_myId);
-		sleep(1);
+		// perror("connect");
 	}
 	
 	// Send data
@@ -129,7 +127,7 @@ void ElfSocket_send(void *buf, int bufLen, int dest){
 	while(bytesLeft != 0){
 		int nbytes = send(sockfd, buf + bytesSent, bytesLeft, 0);
 		
-		if(dest == 0) printf("Process %d sent to %d %d bytes.\n", g_myId, dest, nbytes);
+		// if(dest == 0) printf("Process %d sent to %d %d bytes.\n", g_myId, dest, nbytes);
 		
 		bytesSent += nbytes;
 		bytesLeft -= nbytes;
@@ -150,7 +148,6 @@ void ElfSocket_recv(void *buf, int msgLen, int src){
 	int client_sockfd = accept(recv_sockfd, (struct sockaddr *) &client_addr, &client_len);
 	if(client_sockfd == -1){
 		perror("accept");
-		printf("Socket number: %d\n", client_sockfd);
 		exit(3);
 	}
 
@@ -160,7 +157,7 @@ void ElfSocket_recv(void *buf, int msgLen, int src){
 	while(bytesLeft != 0){
 		int nbytes = recv(client_sockfd, buf + bytesReceived, bytesLeft, 0);
 
-		if(src == 0) printf("Process %d received %d bytes from %d. %d/%d\n", g_myId, nbytes, src, bytesReceived, msgLen);
+		// if(src == 0) printf("Process %d received %d bytes from %d. %d/%d\n", g_myId, nbytes, src, bytesReceived, msgLen);
 
 		bytesReceived += nbytes;
 		bytesLeft -= nbytes;
