@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BASEPORT 6000
+#define BASEPORT 6001
 #define RECVPORT(recvProc, sendProc, nProc) (BASEPORT + recvProc*nProc + sendProc)
 
 #define MAX_PROCNUM 32 // Maximum number of processes
